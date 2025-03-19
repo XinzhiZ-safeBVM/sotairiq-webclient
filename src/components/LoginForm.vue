@@ -24,17 +24,15 @@
       <div v-if="error" class="error-message">
         {{ error }}
       </div>
-      <button type="submit" class="button">Login</button>
+      <button type="submit" class="button" :disabled="loading">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
     </form>
   </div>
 </template>
 
 <script>
-const demoUsers = [
-  { username: 'demo1', password: 'password1', isAdmin: false },
-  { username: 'demo2', password: 'password2', isAdmin: false },
-  { username: 'admin', password: 'admin123', isAdmin: true }
-]
+import authService from '@/services/authService';
 
 export default {
   name: 'LoginForm',
@@ -42,30 +40,41 @@ export default {
     return {
       username: '',
       password: '',
-      error: ''
+      error: '',
+      loading: false
     }
   },
   methods: {
-    handleLogin() {
-      const user = demoUsers.find(
-        u => u.username === this.username && u.password === this.password
-      )
-
-      if (user) {
-        // 使用Vuex store保存用户状态
-        this.$store.dispatch('login', {
-          username: user.username,
-          isAdmin: user.isAdmin
-        })
-
-        // 根据用户角色跳转到相应页面
-        if (user.isAdmin) {
-          this.$router.push('/admin')
+    async handleLogin() {
+      this.loading = true;
+      this.error = '';
+      
+      try {
+        const result = await authService.login(this.username, this.password);
+        
+        if (result.success) {
+          // Get user info from the token (you might want to decode the JWT)
+          // For demo purposes, we'll just use the username
+          this.$store.dispatch('login', {
+            username: this.username,
+            // You would typically extract isAdmin from the token
+            isAdmin: this.username.toLowerCase() === 'admin'
+          });
+          
+          // Redirect based on user role
+          if (this.username.toLowerCase() === 'admin') {
+            this.$router.push('/admin');
+          } else {
+            this.$router.push('/user');
+          }
         } else {
-          this.$router.push('/user')
+          this.error = result.error || 'Login failed. Please check your credentials.';
         }
-      } else {
-        this.error = 'Invalid username or password'
+      } catch (error) {
+        console.error('Login error:', error);
+        this.error = 'An unexpected error occurred. Please try again.';
+      } finally {
+        this.loading = false;
       }
     }
   }

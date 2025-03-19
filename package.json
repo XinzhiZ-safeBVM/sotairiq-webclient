@@ -8,6 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-amplify/auth": "^6.11.5",
+    "axios": "^1.8.4",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
     "vuex": "^4.1.0"
