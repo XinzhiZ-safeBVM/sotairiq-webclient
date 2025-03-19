@@ -42,9 +42,12 @@ export default {
 .container {
   width: 90%;
   max-width: 1200px;
-  margin: 0 auto;
+  background: #ffffff;
   padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   text-align: center;
+  border: 2px solid #007bff;
 }
 
 .header {

@@ -15,16 +15,6 @@ export default {
 </script>
 
 <style scoped>
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #e9f5ff;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
 .container {
   width: 80%;
   max-width: 600px;

@@ -114,11 +114,12 @@ h1 {
 }
 
 .form-input {
-  width: 100%;
+  width: calc(100% - 22px); /* Accounting for padding and border */
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
+  box-sizing: border-box; /* This ensures padding is included in width calculation */
 }
 
 .button {
