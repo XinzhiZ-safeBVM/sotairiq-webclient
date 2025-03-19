@@ -102,19 +102,19 @@ export default {
     }
   },
   created() {
-    // 检查用户是否有管理员权限
+    // Check if user has admin privileges
     if (!this.$store?.state?.user?.isAdmin) {
       this.$router.push('/login')
     }
   },
   methods: {
     addUser() {
-      // 添加新用户到列表
+      // Add new user to the list
       this.users.push({
         username: this.newUser.username,
         isAdmin: this.newUser.isAdmin
       })
-      // 重置表单并关闭模态框
+      // Reset form and close modal
       this.newUser = { username: '', password: '', isAdmin: false }
       this.showAddUserModal = false
     },
@@ -124,7 +124,7 @@ export default {
       this.newPassword = ''
     },
     changePassword() {
-      // 更新用户密码
+      // Update user password
       console.log(`Changing password for ${this.selectedUser.username}`)
       this.showPasswordModal = false
       this.selectedUser = null

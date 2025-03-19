@@ -11,7 +11,7 @@ import SessionData from './components/SessionData.vue'
 import AdminMain from './components/AdminMain.vue'
 import UserManagement from './components/UserManagement.vue'
 
-// 创建路由实例
+// Create router instance
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -58,36 +58,36 @@ const router = createRouter({
   ]
 })
 
-// 路由守卫
+// Route guards
 router.beforeEach((to, from, next) => {
   const isLoggedIn = store.getters.isLoggedIn
   const isAdmin = store.getters.isAdmin
 
-  // 登录页面和首页不需要验证
+  // Login page and home page don't need authentication
   if (to.path === '/login' || to.path === '/') {
-    // 如果已登录且尝试访问登录页，重定向到对应的主页
+    // If already logged in and trying to access login page, redirect to appropriate main page
     if (isLoggedIn && to.path === '/login') {
       next(isAdmin ? '/admin' : '/user')
     } else {
       next()
     }
   } else if (!isLoggedIn) {
-    // 未登录用户重定向到登录页
+    // Redirect unauthenticated users to login page
     next('/login')
   } else if (to.path.startsWith('/admin') && !isAdmin) {
-    // 非管理员用户尝试访问管理页面
+    // Non-admin users trying to access admin pages
     next('/user')
   } else {
     next()
   }
 })
 
-// 创建Vue应用实例
+// Create Vue application instance
 const app = createApp(App)
 
-// 使用路由和状态管理
+// Use router and state management
 app.use(router)
 app.use(store)
 
-// 挂载应用
+// Mount application
 app.mount('#app')

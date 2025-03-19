@@ -22,16 +22,16 @@
 export default {
   name: 'AdminMain',
   created() {
-    // 检查用户是否有管理员权限
+    // Check if user has admin privileges
     if (!this.$store?.state?.user?.isAdmin) {
       this.$router.push('/login')
     }
   },
   methods: {
     logout() {
-      // 清除用户状态
+      // Clear user state
       this.$store.commit('clearUser')
-      // 跳转到登录页面
+      // Redirect to login page
       this.$router.push('/login')
     }
   }

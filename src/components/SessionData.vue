@@ -41,7 +41,7 @@ export default {
     }
   },
   created() {
-    // 在组件创建时根据sessionId加载数据
+    // Load data based on sessionId when component is created
     this.sessionData = [
       { breathCount: 1, time: 4.92, inspiratoryVolume: 521, expiratoryVolume: -465, pressure: 15.14, flow: 30.89, inspiratoryFlowTime: 1.2 },
       { breathCount: 2, time: 8.65, inspiratoryVolume: 492, expiratoryVolume: -520, pressure: 16.06, flow: 34.08, inspiratoryFlowTime: 1.3 },
