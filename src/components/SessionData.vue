@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
+    <div class="header">
+      <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
+      <router-link to="/" class="exit-button">Exit</router-link>
+    </div>
     <h1>Provider Performance Dashboard</h1>
     <div class="provider-name">Provider: {{ providerName }} | Session: {{ sessionId }}</div>
     <table>
@@ -81,9 +84,28 @@ export default {
   overflow-y: auto;
   max-height: 90vh;
 }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 .logo {
   width: 150px;
-  margin-bottom: 20px;
+}
+.exit-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.exit-button:hover {
+  background-color: #5a6268;
 }
 h1 {
   color: #007bff;

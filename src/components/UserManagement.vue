@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
+    <div class="header">
+      <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
+      <router-link to="/" class="exit-button">Exit</router-link>
+    </div>
     <h1>User Management</h1>
     
     <!-- Add User Button -->
@@ -143,16 +146,36 @@ export default {
 .container {
   width: 90%;
   max-width: 1200px;
-  margin: 0 auto;
+  background: #ffffff;
   padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   text-align: center;
+  border: 2px solid #007bff;
 }
-
-.logo {
-  width: 150px;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
-
+.logo {
+  width: 150px;
+}
+.exit-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.exit-button:hover {
+  background-color: #5a6268;
+}
 h1 {
   color: #007bff;
   margin-bottom: 30px;
