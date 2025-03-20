@@ -4,7 +4,7 @@
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
       <div class="button-group">
         <router-link to="/user" class="main-button">Main</router-link>
-        <router-link to="/" class="exit-button">Exit</router-link>
+        <button @click="handleLogout" class="exit-button">Exit</button>
       </div>
     </div>
     <h1>Provider Performance Scoreboard</h1>
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import authService from '@/services/authService';
+
 export default {
   name: 'Scoreboard',
   data() {
@@ -41,6 +43,24 @@ export default {
         { id: 2, name: 'Provider B', score: '88%', lastUpdated: '2024-01-22', status: 'Active' },
         { id: 3, name: 'Provider C', score: '92%', lastUpdated: '2024-01-21', status: 'Active' }
       ]
+    }
+  },
+  created() {
+    // Check if user is authenticated
+    if (!authService.isAuthenticated()) {
+      this.$router.push('/login');
+    }
+  },
+  methods: {
+    handleLogout() {
+      // Clear authentication data
+      authService.logout();
+      // Clear user state in Vuex store
+      if (this.$store) {
+        this.$store.dispatch('logout');
+      }
+      // Redirect to landing page
+      this.$router.push('/');
     }
   }
 }

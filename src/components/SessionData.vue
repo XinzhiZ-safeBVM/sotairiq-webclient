@@ -4,7 +4,7 @@
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
       <div class="button-group">
         <router-link to="/user" class="main-button">Main</router-link>
-        <router-link to="/" class="exit-button">Exit</router-link>
+        <button @click="handleLogout" class="exit-button">Exit</button>
       </div>
     </div>
     <h1>Provider Performance Dashboard</h1>
@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import authService from '@/services/authService';
+
 export default {
   name: 'SessionData',
   data() {
@@ -47,6 +49,10 @@ export default {
     }
   },
   created() {
+    // Check if user is authenticated
+    if (!authService.isAuthenticated()) {
+      this.$router.push('/login');
+    }
     // Load data based on sessionId when component is created
     this.sessionData = [
       { breathCount: 1, time: 4.92, inspiratoryVolume: 521, expiratoryVolume: -465, pressure: 15.14, flow: 30.89, inspiratoryFlowTime: 1.2 },
@@ -70,6 +76,18 @@ export default {
       { breathCount: 19, time: 64.11, inspiratoryVolume: 300, expiratoryVolume: -345, pressure: 29.33, flow: 44.12, inspiratoryFlowTime: 1.4 },
       { breathCount: 20, time: 67.55, inspiratoryVolume: 480, expiratoryVolume: -489, pressure: 30.18, flow: 44.85, inspiratoryFlowTime: 1.2 }
     ]
+  },
+  methods: {
+    handleLogout() {
+      // Clear authentication data
+      authService.logout();
+      // Clear user state in Vuex store
+      if (this.$store) {
+        this.$store.dispatch('logout');
+      }
+      // Redirect to landing page
+      this.$router.push('/');
+    }
   }
 }
 </script>
