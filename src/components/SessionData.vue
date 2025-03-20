@@ -2,7 +2,10 @@
   <div class="container">
     <div class="header">
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
-      <router-link to="/" class="exit-button">Exit</router-link>
+      <div class="button-group">
+        <router-link to="/user" class="main-button">Main</router-link>
+        <router-link to="/" class="exit-button">Exit</router-link>
+      </div>
     </div>
     <h1>Provider Performance Dashboard</h1>
     <div class="provider-name">Provider: {{ providerName }} | Session: {{ sessionId }}</div>
@@ -131,5 +134,23 @@ th, td {
 th {
   background-color: #007bff;
   color: white;
+}
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+.main-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+.main-button:hover {
+  background-color: #0056b3;
 }
 </style>
