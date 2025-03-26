@@ -33,22 +33,46 @@
 
 <script>
 import authService from '@/services/authService';
+import apiService from '@/services/apiService';
 
 export default {
   name: 'Scoreboard',
   data() {
     return {
-      providers: [
-        { id: 1, name: 'Provider A', score: '95%', lastUpdated: '2024-01-23', status: 'Active' },
-        { id: 2, name: 'Provider B', score: '88%', lastUpdated: '2024-01-22', status: 'Active' },
-        { id: 3, name: 'Provider C', score: '92%', lastUpdated: '2024-01-21', status: 'Active' }
-      ]
+      providers: []
     }
   },
-  created() {
+  async created() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       this.$router.push('/login');
+      return;
+    }
+    
+    try {
+      // Load session data from sample file
+      const sessions = await apiService.loadSampleSessions();
+      
+      // Transform sessions into provider format
+      this.providers = sessions.map(session => {
+        // Extract performance score from summary data if available
+        let score = '';
+        let bpm = '';
+        if (session.summaryData && session.summaryData.length > 0) {
+          bpm = session.summaryData[0].bpm;
+          score = `${bpm} BPM`;
+        }
+        
+        return {
+          id: session.id,
+          name: session.id,
+          score: score,
+          lastUpdated: new Date().toLocaleDateString(),
+          status: 'Completed'
+        };
+      });
+    } catch (error) {
+      console.error('Error loading provider data:', error);
     }
   },
   methods: {

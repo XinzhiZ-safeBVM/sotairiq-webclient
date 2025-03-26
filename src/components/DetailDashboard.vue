@@ -13,12 +13,9 @@
       <thead>
         <tr>
           <th>Session Number</th>
-          <th>Average Volume</th>
-          <th>Average Flow</th>
-          <th>Average Pressure</th>
-          <th>Average Inspiratory Flow Time</th>
-          <th>Average Number of Sotair Triggers</th>
-          <th>Sotair IQ</th>
+          <th>Breaths</th>
+          <th>Time (s)</th>
+          <th>BPM</th>
         </tr>
       </thead>
       <tbody>
@@ -26,12 +23,9 @@
           <td>
             <router-link :to="`/session/${session.number}`" class="session-link">{{ session.number }}</router-link>
           </td>
-          <td>{{ session.volume }}</td>
-          <td>{{ session.flow }}</td>
-          <td>{{ session.pressure }}</td>
-          <td>{{ session.flowTime }}</td>
-          <td>{{ session.triggers }}</td>
-          <td>{{ session.score }}</td>
+          <td>{{ session.breaths }}</td>
+          <td>{{ session.time_s }}</td>
+          <td>{{ session.bpm }}</td>
         </tr>
       </tbody>
     </table>
@@ -40,47 +34,51 @@
 
 <script>
 import authService from '@/services/authService';
+import apiService from '@/services/apiService';
 
 export default {
   name: 'DetailDashboard',
   data() {
     return {
-      providerName: 'John Doe',
-      sessions: [
-        {
-          number: 1,
-          volume: '500 mL',
-          flow: '25 L/min',
-          pressure: '20 cmH2O',
-          flowTime: '1.2 s',
-          triggers: 3,
-          score: '85%'
-        },
-        {
-          number: 2,
-          volume: '520 mL',
-          flow: '28 L/min',
-          pressure: '22 cmH2O',
-          flowTime: '1.3 s',
-          triggers: 2,
-          score: '90%'
-        },
-        {
-          number: 3,
-          volume: '510 mL',
-          flow: '26 L/min',
-          pressure: '21 cmH2O',
-          flowTime: '1.25 s',
-          triggers: 2,
-          score: '88%'
-        }
-      ]
+      providerName: '',
+      providerId: this.$route.params.id,
+      sessions: []
     }
   },
-  created() {
+  async created() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       this.$router.push('/login');
+      return;
+    }
+    
+    try {
+      // Load session data from sample file
+      const sessions = await apiService.loadSampleSessions();
+      
+      // Find the session that matches the provider ID
+      const providerSession = sessions.find(session => session.id === this.providerId);
+      
+      if (providerSession) {
+        this.providerName = providerSession.id;
+        
+        // Create session data from the summary
+        if (providerSession.summaryData && providerSession.summaryData.length > 0) {
+          const summary = providerSession.summaryData[0];
+          this.sessions = [
+            {
+              number: providerSession.id,
+              breaths: summary.breaths,
+              time_s: summary.time_s,
+              bpm: summary.bpm
+            }
+          ];
+        }
+      } else {
+        console.error('Provider session not found');
+      }
+    } catch (error) {
+      console.error('Error loading session data:', error);
     }
   },
   methods: {
