@@ -33,34 +33,71 @@
 
 <script>
 import authService from '@/services/authService';
+import apiService from '@/services/apiService';
 
 export default {
   name: 'Scoreboard',
   data() {
     return {
-      providers: [
-        { id: 1, name: 'Provider A', score: '95%', lastUpdated: '2024-01-23', status: 'Active' },
-        { id: 2, name: 'Provider B', score: '88%', lastUpdated: '2024-01-22', status: 'Active' },
-        { id: 3, name: 'Provider C', score: '92%', lastUpdated: '2024-01-21', status: 'Active' }
-      ]
+      providers: []
     }
   },
-  created() {
+  async created() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       this.$router.push('/login');
+      return;
+    }
+    
+    try {
+      // Load sessions by username
+      const sessions = await apiService.getSessionsByUsername();
+      
+      // Create a map to track unique trainee names
+      const traineeMap = new Map();
+      
+      // Process each session to extract trainee information
+      sessions.forEach(session => {
+        if (session.trainee && !traineeMap.has(session.trainee)) {
+          traineeMap.set(session.trainee, {
+            id: session.trainee,
+            name: session.trainee,
+            score: this.calculateScore(session),
+            lastUpdated: this.formatDate(session.timestamp),
+            status: 'Pass'
+          });
+        }
+      });
+      
+      // Convert map to array for display
+      this.providers = Array.from(traineeMap.values());
+    } catch (error) {
+      console.error('Error loading provider data:', error);
     }
   },
   methods: {
     handleLogout() {
-      // Clear authentication data
       authService.logout();
-      // Clear user state in Vuex store
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      // Redirect to landing page
       this.$router.push('/');
+    },
+    
+    calculateScore(session) {
+      // Placeholder for score calculation logic
+      return '85%';
+    },
+    
+    formatDate(timestamp) {
+      if (!timestamp) return '-';
+      
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString();
+      } catch (e) {
+        return '-';
+      }
     }
   }
 }

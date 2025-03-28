@@ -3,7 +3,7 @@ import axios from 'axios';
 // Environment variables
 const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL;
 const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID;
-const COGNITO_ENDPOINT = import.meta.env.VITE_COGNITO_ENDPOINT || 'https://cognito-idp.us-east-1.amazonaws.com/';
+const COGNITO_ENDPOINT = import.meta.env.VITE_COGNITO_ENDPOINT;
 const AWS_REGION = import.meta.env.VITE_AWS_REGION || 'us-east-1';
 
 /**
@@ -39,13 +39,15 @@ async function login(username, password) {
     // Store tokens securely
     const { IdToken, RefreshToken, AccessToken } = response.data.AuthenticationResult;
     
-    // Store tokens in localStorage for now
+    // Store tokens and username in localStorage
     localStorage.setItem('idToken', IdToken);
     localStorage.setItem('refreshToken', RefreshToken);
     localStorage.setItem('accessToken', AccessToken);
+    localStorage.setItem('username', username);
     
     return {
       success: true,
+      username: username,
       tokens: {
         idToken: IdToken,
         refreshToken: RefreshToken,
@@ -100,12 +102,13 @@ async function refreshToken() {
 }
 
 /**
- * Logout user by removing tokens
+ * Logout user by removing tokens and user info
  */
 function logout() {
   localStorage.removeItem('idToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('accessToken');
+  localStorage.removeItem('username');
 }
 
 /**
@@ -124,10 +127,19 @@ function getToken() {
   return localStorage.getItem('idToken');
 }
 
+/**
+ * Get the current username
+ * @returns {string|null} - Username or null if not authenticated
+ */
+function getUsername() {
+  return localStorage.getItem('username');
+}
+
 export default {
   login,
   logout,
   refreshToken,
   isAuthenticated,
-  getToken
+  getToken,
+  getUsername
 };
