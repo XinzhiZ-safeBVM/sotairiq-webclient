@@ -50,41 +50,54 @@ export default {
     }
     
     try {
-      // Load session data from sample file
-      const sessions = await apiService.loadSampleSessions();
+      // Load sessions by username
+      const sessions = await apiService.getSessionsByUsername();
       
-      // Transform sessions into provider format
-      this.providers = sessions.map(session => {
-        // Extract performance score from summary data if available
-        let score = '';
-        let bpm = '';
-        if (session.summaryData && session.summaryData.length > 0) {
-          bpm = session.summaryData[0].bpm;
-          score = `${bpm} BPM`;
+      // Create a map to track unique trainee names
+      const traineeMap = new Map();
+      
+      // Process each session to extract trainee information
+      sessions.forEach(session => {
+        if (session.trainee && !traineeMap.has(session.trainee)) {
+          traineeMap.set(session.trainee, {
+            id: session.trainee,
+            name: session.trainee,
+            score: this.calculateScore(session),
+            lastUpdated: this.formatDate(session.timestamp),
+            status: 'Pass'
+          });
         }
-        
-        return {
-          id: session.id,
-          name: session.id,
-          score: score,
-          lastUpdated: new Date().toLocaleDateString(),
-          status: 'Completed'
-        };
       });
+      
+      // Convert map to array for display
+      this.providers = Array.from(traineeMap.values());
     } catch (error) {
       console.error('Error loading provider data:', error);
     }
   },
   methods: {
     handleLogout() {
-      // Clear authentication data
       authService.logout();
-      // Clear user state in Vuex store
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      // Redirect to landing page
       this.$router.push('/');
+    },
+    
+    calculateScore(session) {
+      // Placeholder for score calculation logic
+      return '85%';
+    },
+    
+    formatDate(timestamp) {
+      if (!timestamp) return '-';
+      
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleDateString();
+      } catch (e) {
+        return '-';
+      }
     }
   }
 }

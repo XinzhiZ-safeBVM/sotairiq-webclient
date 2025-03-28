@@ -4,8 +4,6 @@ import authService from './authService';
 // Environment variables
 const API_GATEWAY_URL = import.meta.env.VITE_API_GATEWAY_URL || 'https://your-api-gateway-url.execute-api.us-east-1.amazonaws.com/dev';
 
-// Sample data path
-const SAMPLE_DATA_PATH = '/example_data/sample_session_combine_plain.txt';
 
 /**
  * Make a public API request (no authentication)
@@ -102,123 +100,196 @@ async function fetchAdminData(endpoint, params = {}) {
   }
 }
 
-// parseDynamoDBItem function removed as we're now using standard JSON format
+
 
 /**
- * Parse Python tuple string format to JavaScript array
- * @param {string} tupleString - String representation of Python tuples
- * @returns {Array} - Array of objects
+ * Generic function to get session data by a specific key and value
+ * @param {string} keyType - Type of key (id, username, trainee)
+ * @param {string} keyValue - Value of the key
+ * @returns {Promise} - Raw session data from API
  */
-/**
- * Parse string representation of arrays to JavaScript array of objects
- * @param {string} dataString - String representation of arrays
- * @returns {Array} - Array of objects
- */
-function parseTupleString(dataString) {
-  if (!dataString) return [];
+async function getSessionByKey(keyType, keyValue) {
+  if (!keyValue) {
+    throw new Error(`${keyType} value is required`);
+  }
   
   try {
-    // Parse the string as JSON array
-    const parsedData = JSON.parse(dataString);
-    
-    // Check if the parsed data is an array
-    if (!Array.isArray(parsedData)) {
-      console.error('Parsed data is not an array');
-      return [];
-    }
-    
-    // First array contains headers
-    const headers = parsedData[0];
-    
-    // Process data rows
-    const result = [];
-    for (let i = 1; i < parsedData.length; i++) {
-      const values = parsedData[i];
-      
-      // Skip the last element if it's an empty string
-      if (i === parsedData.length - 1 && values === "") {
-        continue;
-      }
-      
-      // Create object with header keys and values
-      const obj = {};
-      for (let j = 0; j < headers.length; j++) {
-        obj[headers[j]] = values[j];
-      }
-      
-      result.push(obj);
-    }
-    
-    return result;
+    const response = await fetchProtectedData(`/api/session/${keyType}/${keyValue}`);
+    return response;
   } catch (error) {
-    console.error('Error parsing data string:', error);
-    return [];
+    console.error(`Error fetching session by ${keyType}:`, error);
+    throw error;
   }
 }
 
 /**
- * Load sample session data from file
- * @returns {Promise<Array>} - Array of session data
+ * Parse breaths data from string format to structured objects
+ * @param {Object} sessionData - Session data containing breaths
+ * @returns {Object} - Session data with parsed breaths
  */
-async function loadSampleSessions() {
-  try {
-    const response = await axios.get(SAMPLE_DATA_PATH);
-    const data = response.data;
-    
-    // Process the data based on its format
-    let sessions = [];
-    
-    if (typeof data === 'string') {
-      // Parse the string as JSON
-      try {
-        sessions = JSON.parse(data);
-      } catch (jsonError) {
-        console.error('Error parsing JSON data:', jsonError);
-        return [];
-      }
-    } else if (Array.isArray(data)) {
-      // Data is already an array
-      sessions = data;
-    } else {
-      // Single item
-      sessions = [data];
-    }
-    
-    // Process each session to parse the breaths and summary data
-    return sessions.map(item => {
-      const parsedItem = { ...item };
-      
-      // Parse the breaths and summary data
-      if (parsedItem.breaths) {
-        parsedItem.breathsData = parseTupleString(parsedItem.breaths);
-      }
-      
-      if (parsedItem.summary) {
-        parsedItem.summaryData = parseTupleString(parsedItem.summary);
-      }
-      
-      return parsedItem;
-    });
-  } catch (error) {
-    console.error('Error loading sample data:', error);
-    return [];
+function parseBreathsData(sessionData) {
+  if (!sessionData || !sessionData.breaths || typeof sessionData.breaths !== 'string') {
+    return sessionData;
   }
+  
+  try {
+    // Parse the breaths data which is in a nested array format
+    const breathsData = JSON.parse(sessionData.breaths);
+    
+    // Extract the header row and data rows
+    const headers = breathsData[0];
+    const dataRows = breathsData.slice(1, -1); // Exclude the last empty string element
+    
+    // Convert the data rows to objects using the headers as keys
+    const parsedBreaths = dataRows.map(row => {
+      const breathObj = {};
+      headers.forEach((header, index) => {
+        breathObj[header] = row[index];
+      });
+      return breathObj;
+    });
+    
+    // Create a new object to avoid mutating the original
+    return {
+      ...sessionData,
+      breathsData: parsedBreaths
+    };
+  } catch (parseError) {
+    console.error('Error parsing breaths data:', parseError);
+    return sessionData;
+  }
+}
+
+/**
+ * Parse summary data from string format to structured objects
+ * @param {Object} sessionData - Session data containing summary
+ * @returns {Object} - Session data with parsed summary
+ */
+function parseSummaryData(sessionData) {
+  if (!sessionData || !sessionData.summary || typeof sessionData.summary !== 'string') {
+    return sessionData;
+  }
+  
+  try {
+    // Parse the summary data which is in a nested array format
+    const summaryData = JSON.parse(sessionData.summary);
+    
+    // Extract the header row and data rows
+    const headers = summaryData[0];
+    const dataRows = summaryData.slice(1, -1); // Exclude the last empty string element
+    
+    // For summary, we typically have just one data row
+    if (dataRows.length === 1) {
+      const summaryObj = {};
+      headers.forEach((header, index) => {
+        summaryObj[header] = dataRows[0][index];
+      });
+      
+      // Create a new object to avoid mutating the original
+      return {
+        ...sessionData,
+        summaryData: summaryObj
+      };
+    } else {
+      // Handle multiple summary rows if they exist
+      const parsedSummary = dataRows.map(row => {
+        const summaryObj = {};
+        headers.forEach((header, index) => {
+          summaryObj[header] = row[index];
+        });
+        return summaryObj;
+      });
+      
+      return {
+        ...sessionData,
+        summaryData: parsedSummary
+      };
+    }
+  } catch (parseError) {
+    console.error('Error parsing summary data:', parseError);
+    return sessionData;
+  }
+}
+
+/**
+ * Parse all structured data in a session
+ * @param {Object} sessionData - Raw session data
+ * @returns {Object} - Session data with all parsed components
+ */
+function parseSessionData(sessionData) {
+  // First parse the breaths data
+  const withBreaths = parseBreathsData(sessionData);
+  
+  // Then parse the summary data
+  return parseSummaryData(withBreaths);
 }
 
 /**
  * Get session data by ID
  * @param {string} sessionId - Session ID
- * @returns {Promise<Object>} - Session data
+ * @returns {Promise} - Raw session data
  */
 async function getSessionById(sessionId) {
-  const sessions = await loadSampleSessions();
-  return sessions.find(session => session.id === sessionId) || null;
+  if (!sessionId) {
+    throw new Error('Session ID is required');
+  }
+  
+  try {
+    return await getSessionByKey('id', sessionId);
+  } catch (error) {
+    console.error('Error fetching session by ID:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get sessions by username
+ * @param {string} username - Username to fetch sessions for (defaults to current user)
+ * @returns {Promise} - Array of session data
+ */
+async function getSessionsByUsername(username = null) {
+  // If no username provided, use the current user's username
+  const currentUsername = username || authService.getUsername();
+  
+  if (!currentUsername) {
+    throw new Error('Username is required');
+  }
+  
+  try {
+    return await getSessionByKey('username', currentUsername);
+  } catch (error) {
+    console.error('Error fetching sessions by username:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get sessions by trainee name
+ * @param {string} traineeName - Trainee name to fetch sessions for
+ * @returns {Promise} - Array of session data
+ */
+async function getSessionsByTrainee(traineeName) {
+  if (!traineeName) {
+    throw new Error('Trainee name is required');
+  }
+  
+  try {
+    return await getSessionByKey('trainee', traineeName);
+  } catch (error) {
+    console.error('Error fetching sessions by trainee:', error);
+    throw error;
+  }
 }
 
 export default {
   fetchPublicData,
   fetchProtectedData,
   fetchAdminData,
-  loadSampleSessions,
-  getSessionById
+  getSessionByKey,
+  parseBreathsData,
+  parseSummaryData,
+  parseSessionData,
+  getSessionById,
+  getSessionsByUsername,
+  getSessionsByTrainee
 };

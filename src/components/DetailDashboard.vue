@@ -52,44 +52,36 @@ export default {
       return;
     }
     
+    // Set provider name from route params
+    this.providerName = this.providerId;
+    
     try {
-      // Load session data from sample file
-      const sessions = await apiService.loadSampleSessions();
+      // Get sessions for this trainee
+      const sessions = await apiService.getSessionsByTrainee(this.providerId);
       
-      // Find the session that matches the provider ID
-      const providerSession = sessions.find(session => session.id === this.providerId);
-      
-      if (providerSession) {
-        this.providerName = providerSession.id;
+      // Process each session to extract summary data
+      this.sessions = sessions.map(session => {
+        // Parse the summary data
+        const parsedSession = apiService.parseSummaryData(session);
+        const summaryData = parsedSession.summaryData || {};
         
-        // Create session data from the summary
-        if (providerSession.summaryData && providerSession.summaryData.length > 0) {
-          const summary = providerSession.summaryData[0];
-          this.sessions = [
-            {
-              number: providerSession.id,
-              breaths: summary.breaths,
-              time_s: summary.time_s,
-              bpm: summary.bpm
-            }
-          ];
-        }
-      } else {
-        console.error('Provider session not found');
-      }
+        return {
+          number: session.id,
+          breaths: summaryData.breaths || '-',
+          time_s: summaryData.time_s ? parseFloat(summaryData.time_s).toFixed(2) : '-',
+          bpm: summaryData.bpm ? parseFloat(summaryData.bpm).toFixed(1) : '-'
+        };
+      });
     } catch (error) {
       console.error('Error loading session data:', error);
     }
   },
   methods: {
     handleLogout() {
-      // Clear authentication data
       authService.logout();
-      // Clear user state in Vuex store
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      // Redirect to landing page
       this.$router.push('/');
     }
   }

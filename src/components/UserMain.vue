@@ -6,7 +6,7 @@
     </div>
     <h1>Welcome, {{ username }}</h1>
     <p>Please choose an option below:</p>
-    <router-link to="/download" class="button">Download Sotair IQ</router-link>
+    <button @click="openDownloadSite" class="button">Download Sotair IQ</button>
     <router-link to="/scoreboard" class="button">Go to Provider Performance Scoreboard</router-link>
     <button @click="handleLogout" class="button logout-button">Logout</button>
   </div>
@@ -33,6 +33,9 @@ export default {
       localStorage.removeItem('currentUser')
       this.username = ''
       this.$router.push('/login')
+    },
+    openDownloadSite() {
+      window.open('https://sotairiq.safebvm.com/', 'SotairIQDownload', 'width=1024,height=768,resizable=yes')
     }
   }
 }
