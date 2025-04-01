@@ -2,12 +2,12 @@
   <div class="container">
     <div class="header">
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
-      <router-link to="" class="exit-button">Exit</router-link>
+      <router-link to="/" class="exit-button">Exit</router-link>
     </div>
     <h1>Welcome to Sotair IQ</h1>
     <p>Please choose an option below:</p>
-    <router-link to="login" class="button">Login</router-link>
-    <router-link to="scoreboard" class="button">View Provider Performance Scoreboard</router-link>
+    <router-link to="/login" class="button">Login</router-link>
+    <router-link to="/scoreboard" class="button">View Provider Performance Scoreboard</router-link>
   </div>
 </template>
 

@@ -3,7 +3,7 @@
     <div class="header">
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
       <div class="button-group">
-        <router-link to="user" class="main-button">Main</router-link>
+        <router-link to="/user" class="main-button">Main</router-link>
         <button @click="handleLogout" class="exit-button">Exit</button>
       </div>
     </div>
@@ -52,7 +52,7 @@ export default {
   async created() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
-      this.$router.push('login');
+      this.$router.push('/login');
       return;
     }
     
@@ -108,7 +108,7 @@ export default {
         this.$store.dispatch('logout');
       }
       // Redirect to landing page
-      this.$router.push('');
+      this.$router.push('/');
     },
     
     // Manually parse breaths data if the parser didn't work
