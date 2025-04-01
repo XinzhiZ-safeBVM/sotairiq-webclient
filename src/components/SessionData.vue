@@ -3,7 +3,7 @@
     <div class="header">
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
       <div class="button-group">
-        <router-link to="user" class="main-button">Main</router-link>
+        <router-link to="../../user" class="main-button">Main</router-link>
         <button @click="handleLogout" class="exit-button">Exit</button>
       </div>
     </div>
@@ -107,8 +107,8 @@ export default {
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      // Redirect to landing page
-      this.$router.push('');
+      // Redirect to landing page with absolute path
+      this.$router.push('/');
     },
     
     // Manually parse breaths data if the parser didn't work

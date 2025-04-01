@@ -77,11 +77,14 @@ export default {
   },
   methods: {
     handleLogout() {
+      // Clear authentication data
       authService.logout();
+      // Clear user state in Vuex store if available
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      this.$router.push('');
+      // Redirect to landing page with absolute path
+      this.$router.push('/');
     },
     
     calculateScore(session) {
