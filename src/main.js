@@ -13,7 +13,7 @@ import UserManagement from './components/UserManagement.vue'
 
 // Create router instance
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/app/'),
   routes: [
     {
       path: '/',
