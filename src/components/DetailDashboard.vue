@@ -3,7 +3,7 @@
     <div class="header">
       <img src="@/assets/safebvm-logo.png" alt="SafeBVM Logo" class="logo">
       <div class="button-group">
-        <router-link to="/user" class="main-button">Main</router-link>
+        <router-link to="user" class="main-button">Main</router-link>
         <button @click="handleLogout" class="exit-button">Exit</button>
       </div>
     </div>
@@ -21,7 +21,7 @@
       <tbody>
         <tr v-for="session in sessions" :key="session.number">
           <td>
-            <router-link :to="`/session/${session.number}`" class="session-link">{{ session.number }}</router-link>
+            <router-link :to="`session/${session.number}`" class="session-link">{{ session.number }}</router-link>
           </td>
           <td>{{ session.breaths }}</td>
           <td>{{ session.time_s }}</td>
@@ -48,7 +48,7 @@ export default {
   async created() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
-      this.$router.push('/login');
+      this.$router.push('login');
       return;
     }
     
@@ -82,7 +82,7 @@ export default {
       if (this.$store) {
         this.$store.dispatch('logout');
       }
-      this.$router.push('/');
+      this.$router.push('');
     }
   }
 }
