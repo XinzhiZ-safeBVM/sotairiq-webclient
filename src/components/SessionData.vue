@@ -45,7 +45,7 @@ export default {
   data() {
     return {
       providerName: '',
-      sessionId: this.$route.params.id,
+      sessionId: this.$route.params.sessionId || this.$route.params.id,
       sessionData: []
     }
   },

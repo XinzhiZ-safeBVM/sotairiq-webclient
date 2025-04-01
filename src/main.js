@@ -13,7 +13,7 @@ import UserManagement from './components/UserManagement.vue'
 
 // Create router instance
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/app/'),
   routes: [
     {
       path: '/',
@@ -43,6 +43,11 @@ const router = createRouter({
     {
       path: '/session/:id',
       name: 'SessionData',
+      component: SessionData
+    },
+    {
+      path: '/dashboard/:id/:sessionId',
+      name: 'DashboardSessionData',
       component: SessionData
     },
     {
@@ -91,3 +96,7 @@ app.use(store)
 
 // Mount application
 app.mount('#app')
+
+// Add this temporarily to debug
+console.log('API URL:', import.meta.env.VITE_API_GATEWAY_URL);
+console.log('All env vars:', import.meta.env);

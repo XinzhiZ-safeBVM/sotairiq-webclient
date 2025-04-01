@@ -21,7 +21,7 @@
       <tbody>
         <tr v-for="session in sessions" :key="session.number">
           <td>
-            <router-link :to="`session/${session.number}`" class="session-link">{{ session.number }}</router-link>
+            <router-link :to="`${providerId}/${session.number}`" class="session-link">{{ session.number }}</router-link>
           </td>
           <td>{{ session.breaths }}</td>
           <td>{{ session.time_s }}</td>
