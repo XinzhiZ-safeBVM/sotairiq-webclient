@@ -6,11 +6,11 @@
     </div>
     <h1>Admin Dashboard</h1>
     <div class="admin-buttons">
-      <router-link to="/admin/users" class="admin-button">
+      <router-link to="admin/users" class="admin-button">
         <span class="button-icon">👥</span>
         User Management
       </router-link>
-      <router-link to="/admin/data" class="admin-button">
+      <router-link to="admin/data" class="admin-button">
         <span class="button-icon">📊</span>
         Data Management
       </router-link>
@@ -24,7 +24,7 @@ export default {
   created() {
     // Check if user has admin privileges
     if (!this.$store?.state?.user?.isAdmin) {
-      this.$router.push('/login')
+      this.$router.push('login')
     }
   },
   methods: {
@@ -32,7 +32,7 @@ export default {
       // Clear user state
       this.$store.commit('clearUser')
       // Redirect to login page
-      this.$router.push('/login')
+      this.$router.push('login')
     }
   }
 }

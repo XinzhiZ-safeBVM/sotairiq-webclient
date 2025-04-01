@@ -63,9 +63,9 @@ export default {
           
           // Redirect based on user role
           if (this.username.toLowerCase() === 'admin') {
-            this.$router.push('/admin');
+            this.$router.push('admin');
           } else {
-            this.$router.push('/user');
+            this.$router.push('user');
           }
         } else {
           this.error = result.error || 'Login failed. Please check your credentials.';
